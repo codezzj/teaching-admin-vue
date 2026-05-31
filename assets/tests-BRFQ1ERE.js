@@ -1,0 +1,1 @@
+import{n as e}from"./index-BrfAIpk1.js";function t(t){return e.get(`/tests`,{params:t})}function n(t){return e.get(`/tests/${t}`)}function r(t){return e.post(`/tests`,t)}function i(t,n){return e.post(`/tests/${t}/grade`,n)}function a(t){return e.post(`/tests/${t}/ai-grade`)}export{i as a,t as i,r as n,n as r,a as t};
