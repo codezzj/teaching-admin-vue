@@ -153,5 +153,18 @@ export default [
 
             return { code: 0, message: 'AI批改完成', data: test }
         }
+    },
+
+    // 删除测试
+    {
+        url: /\/api\/tests\/\d+$/,
+        method: 'delete',
+        response: ({ url }) => {
+            const id = parseInt(url.split('/').pop(), 10)
+            const idx = tests.findIndex((t) => t.id === id)
+            if (idx === -1) return { code: 1, message: '测试不存在', data: null }
+            tests.splice(idx, 1)
+            return { code: 0, message: '删除成功', data: true }
+        }
     }
 ]

@@ -26,7 +26,7 @@ request.interceptors.response.use(
     (err) => {
         if (err?.response?.status === 401) {
             clearAuth()
-            location.href = '/login'
+            window.location.href = '/#/login'
         } else {
             ElMessage.error(err?.message || '网络错误')
         }

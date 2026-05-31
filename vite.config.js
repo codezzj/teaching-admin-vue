@@ -7,7 +7,8 @@ export default defineConfig({
     vue(),
     viteMockServe({
       mockPath: 'mock',
-      localEnabled: true
+      localEnabled: true,
+      prodEnabled: true
     })
   ],
   base: '/teaching-admin-vue/'

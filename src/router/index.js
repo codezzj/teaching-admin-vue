@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import { getToken } from '../utils/auth'
 
 import Login from '../views/Login.vue'
@@ -42,7 +42,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory('/teaching-admin-vue'),
+  history: createWebHashHistory('/teaching-admin-vue'),
   routes
 })
 

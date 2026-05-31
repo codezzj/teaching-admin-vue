@@ -20,9 +20,10 @@
           <template #default="{ row }">{{ row.questions?.length || 0 }}</template>
         </el-table-column>
         <el-table-column prop="createdAt" label="创建时间" width="160" />
-        <el-table-column label="操作" width="120" fixed="right">
+        <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
             <el-button size="small" type="primary" @click="$router.push(`/tests/${row.id}`)">进入批改</el-button>
+            <el-button size="small" text type="danger" @click="onDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -47,7 +48,8 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { getTests } from '../../api/tests'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { getTests, deleteTest } from '../../api/tests'
 
 const loading = ref(false)
 const keyword = ref('')
@@ -84,6 +86,17 @@ function onPageChange(p) {
 function onSizeChange(ps) {
   pageSize.value = ps
   page.value = 1
+  fetchList()
+}
+
+async function onDelete(row) {
+  await ElMessageBox.confirm(`确认删除测试「${row.title}」？`, '删除确认', {
+    type: 'warning',
+    confirmButtonText: '删除',
+    cancelButtonText: '取消'
+  })
+  await deleteTest(row.id)
+  ElMessage.success('已删除')
   fetchList()
 }
 

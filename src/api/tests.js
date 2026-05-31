@@ -20,3 +20,7 @@ export function manualGrade(testId, data) {
 export function aiGrade(testId) {
     return request.post(`/tests/${testId}/ai-grade`)
 }
+
+export function deleteTest(id) {
+    return request.delete(`/tests/${id}`)
+}
