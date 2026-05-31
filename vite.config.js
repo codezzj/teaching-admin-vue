@@ -9,5 +9,6 @@ export default defineConfig({
       mockPath: 'mock',
       localEnabled: true
     })
-  ]
+  ],
+  base: '/teaching-admin-vue/'
 })
