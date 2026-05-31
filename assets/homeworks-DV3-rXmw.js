@@ -1,0 +1,1 @@
+import{n as e}from"./index-ChyAz210.js";function t(t){return e.get(`/homeworks`,{params:t})}function n(t){return e.post(`/homeworks`,t)}export{t as n,n as t};
