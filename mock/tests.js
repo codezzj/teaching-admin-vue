@@ -37,7 +37,7 @@ let tests = [
     },
     {
         id: 2,
-        title: 'Vue Router 4 路由守卫测试',
+        title: 'Vue Router 5 路由守卫测试',
         courseName: 'Web前端框架技术2',
         questions: [
             {

@@ -39,7 +39,7 @@ let homeworks = [
         courseId: 3,
         courseName: 'Web前端框架技术3',
         deadline: past(3),
-        requirement: '实现 Vue Router 4 的前置路由守卫和后置路由守卫，完成以下功能：未登录跳转登录页、动态路由加载、页面标题自动更新。撰写一篇分析文档，对比 beforeEach 和 afterEach 的使用场景。',
+        requirement: '实现 Vue Router 5 的前置路由守卫和后置路由守卫，完成以下功能：未登录跳转登录页、动态路由加载、页面标题自动更新。撰写一篇分析文档，对比 beforeEach 和 afterEach 的使用场景。',
         status: 'completed'
     },
     {
