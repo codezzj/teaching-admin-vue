@@ -1,1 +1,0 @@
-import{n as e}from"./index-B6pINFuO.js";function t(t){return e.get(`/questions`,{params:t})}function n(t){return e.post(`/questions`,t)}function r(t,n){return e.put(`/questions/${t}`,n)}function i(t){return e.delete(`/questions/${t}`)}function a(t){return e.post(`/questions/ai-generate`,t)}export{r as a,t as i,n,i as r,a as t};
