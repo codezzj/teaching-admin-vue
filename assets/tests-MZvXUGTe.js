@@ -1,0 +1,1 @@
+import{n as e}from"./index-CzB6DArZ.js";function t(t){return e.get(`/tests`,{params:t})}function n(t){return e.get(`/tests/${t}`)}function r(t){return e.post(`/tests`,t)}function i(t,n){return e.post(`/tests/${t}/grade`,n)}function a(t){return e.post(`/tests/${t}/ai-grade`)}function o(t){return e.delete(`/tests/${t}`)}export{t as a,n as i,r as n,i as o,o as r,a as t};
