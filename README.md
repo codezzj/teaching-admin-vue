@@ -53,9 +53,11 @@
 | 项目名称 | 智能教学辅助管理系统（教师端） |
 | 仓库地址 | [https://github.com/codezzj/teaching-admin-vue](https://github.com/codezzj/teaching-admin-vue) |
 | 演示地址 | [https://codezzj.github.io/teaching-admin-vue/login](https://codezzj.github.io/teaching-admin-vue/login) |
-| 版本号 | 0.0.0 |
-| 构建时间 | 2025-05-30 |
-| 开发环境 | Node.js 20.13.1 |
+| 版本号 | 1.0.0 |
+| 构建时间 | 2025-06-01 |
+| 开发环境 | Node.js ≥ 18.x |
+| 路由模式 | Hash 模式（`createWebHashHistory`） |
+| 状态管理 | Composition API（ref / reactive） |
 
 ---
 
@@ -164,7 +166,14 @@
 
 ---
 
-## 
+## 环境要求
+
+| 环境 | 版本要求 | 说明 |
+|------|---------|------|
+| Node.js | ≥ 18.0.0 | JavaScript 运行环境 |
+| npm | ≥ 9.0.0 | 包管理器（随 Node.js 安装） |
+| Git | ≥ 2.0 | 版本控制（可选） |
+| Docker | ≥ 20.10 | 容器部署（可选） |
 
 ---
 
@@ -193,7 +202,9 @@ npm install --registry=https://registry.npmmirror.com
 npm run dev
 ```
 
-启动成功后，访问：http://localhost:5173
+启动成功后，访问：**http://localhost:5173/teaching-admin-vue/**
+
+> ⚠️ 项目配置了 `base: '/teaching-admin-vue/'`，直接访问 `http://localhost:5173` 会 404。
 
 ### 4. 登录系统
 
@@ -228,15 +239,15 @@ vite-project/
 │       └── deploy.yml              # GitHub Actions 部署配置
 ├── .vscode/
 │   └── extensions.json             # VS Code 推荐扩展
-├── mock/                           # Mock 数据目录
-│   ├── auth.js                     # 认证相关 Mock
-│   ├── students.js                 # 学生管理 Mock
-│   ├── courses.js                  # 课程管理 Mock
-│   ├── homeworks.js                # 作业管理 Mock
-│   ├── attendances.js              # 考勤管理 Mock
-│   ├── questions.js                # 题库管理 Mock
-│   ├── tests.js                    # 测试管理 Mock
-│   └── profile.js                  # 个人中心 Mock
+├── mock/                           # Mock 模拟数据（vite-plugin-mock）
+│   ├── auth.js                     #   登录/认证接口
+│   ├── students.js                 #   学生 CRUD + 分页搜索
+│   ├── courses.js                  #   课程 CRUD + 批量删除
+│   ├── homeworks.js                #   作业发布 + 状态筛选
+│   ├── attendances.js              #   考勤记录 + 统计 + 签到码
+│   ├── questions.js                #   题库 CRUD + AI 生成
+│   ├── tests.js                    #   测试创建 + AI 批改
+│   └── profile.js                  #   个人信息 + 密码修改
 ├── public/                         # 静态资源目录
 │   ├── favicon.svg
 │   └── icons.svg
@@ -264,39 +275,55 @@ vite-project/
 │   │   ├── auth.js                 # 认证工具
 │   │   └── request.js              # Axios 实例配置
 │   ├── views/                      # 页面组件
-│   │   ├── Login.vue
-│   │   ├── Dashboard.vue
+│   │   ├── Login.vue               #   登录页
+│   │   ├── Dashboard.vue           #   首页仪表盘
 │   │   ├── students/
+│   │   │   └── StudentsList.vue    #   学生管理
 │   │   ├── courses/
+│   │   │   ├── CoursesList.vue     #   课程管理（卡片列表）
+│   │   │   └── CourseDetail.vue    #   课程详情
 │   │   ├── homeworks/
+│   │   │   ├── HomeworksList.vue   #   作业列表
+│   │   │   └── HomeworkCreate.vue  #   发布作业
 │   │   ├── attendances/
+│   │   │   └── AttendancesList.vue #   考勤管理
 │   │   ├── questions/
+│   │   │   └── QuestionsList.vue   #   题库管理
 │   │   ├── tests/
+│   │   │   ├── TestsList.vue       #   测试列表
+│   │   │   ├── TestCreate.vue      #   创建测试
+│   │   │   └── TestDetail.vue      #   测试批改
 │   │   └── profile/
+│   │       └── Profile.vue         #   个人中心
 │   ├── App.vue                     # 根组件
 │   ├── main.js                     # 入口文件
 │   └── style.css                   # 全局样式
 ├── .dockerignore                   # Docker 忽略文件
 ├── .gitignore                      # Git 忽略文件
-├── Dockerfile                      # Docker 镜像构建
-├── docker-compose.yml              # Docker Compose 配置
-├── nginx.conf                      # Nginx 配置
-├── deploy.sh                       # 部署脚本
+├── Dockerfile                      # Docker 镜像构建（多阶段）
+├── docker-compose.yml              # Docker Compose 编排
+├── nginx.conf                      # Nginx 配置（Gzip/Security Headers）
+├── deploy.sh                       # 一键部署脚本
 ├── index.html                      # HTML 入口
-├── vite.config.js                  # Vite 配置
+├── vite.config.js                  # Vite 配置（含 Mock 插件）
 ├── package.json                    # 项目依赖配置
-├── package-lock.json               # 依赖锁定文件
-└── README.md                       # 项目文档
+└── package-lock.json               # 依赖锁定文件
 ```
 
 ### 关键文件说明
 
 | 文件路径 | 说明 |
 |---------|------|
-| `src/router/index.js` | 路由配置、路由守卫 |
-| `src/utils/request.js` | Axios 配置、请求/响应拦截器 |
-| `vite.config.js` | Vite 构建配置、插件配置 |
-| `.github/workflows/deploy.yml` | GitHub Actions CI/CD 配置 |
+| `src/router/index.js` | 路由配置、嵌套路由、全局前置守卫 |
+| `src/utils/request.js` | Axios 实例、请求/响应拦截器、Token 注入 |
+| `src/utils/auth.js` | Token 与用户信息 localStorage 管理 |
+| `src/layouts/AdminLayout.vue` | 后台布局（侧边栏 + 顶栏 + 内容区） |
+| `vite.config.js` | Vite 构建配置、Mock 插件、base 路径 |
+| `.github/workflows/deploy.yml` | GitHub Actions CI/CD（自动部署到 GitHub Pages） |
+| `Dockerfile` | 多阶段 Docker 构建（Node 编译 + Nginx 运行） |
+| `nginx.conf` | Nginx 配置（Gzip、缓存、安全头、SPA 回退） |
+| `docker-compose.yml` | Docker Compose 服务编排 |
+| `deploy.sh` | 一键部署脚本（环境检查 + 容器启动） |
 
 ---
 
@@ -370,23 +397,39 @@ const router = createRouter({
 
 ### 方式二：Docker 部署
 
+项目已配置多阶段 Docker 构建，最终镜像仅包含 Nginx + 静态文件，体积小巧。
+
 ```bash
-# 构建镜像
-docker-compose build
+# 构建并启动（首次或代码更新后）
+docker compose up -d --build
 
-# 启动服务
-docker-compose up -d
+# 仅启动（已构建过镜像）
+docker compose up -d
 
-# 查看日志
-docker-compose logs -f
+# 查看运行日志
+docker compose logs -f
+
+# 查看运行状态
+docker compose ps
 
 # 停止服务
-docker-compose down
+docker compose down
 ```
 
-访问：http://localhost:8080
+访问：**http://localhost:8080**
 
-### 方式三：手动部署
+> 📦 镜像基于 `nginx:1.27-alpine`，已配置 Gzip 压缩、静态资源长缓存、安全响应头。Dockerfile 内部会自动执行 `npx vite build --base /`，无需手动构建。
+
+### 方式三：一键部署脚本
+
+项目提供了 `deploy.sh` 一键部署脚本，自动检查环境、拉取代码、构建并启动 Docker 容器：
+
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+### 方式四：手动部署
 
 1. 构建项目：
 
@@ -405,7 +448,7 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
-    # Hash 模式，无需 SPA 回退
+    # SPA 路由回退（Hash 模式也建议保留，防止直接访问子路径 404）
     location / {
         try_files $uri $uri/ /index.html;
     }
@@ -618,33 +661,38 @@ git commit -m "feat(questions): 添加 AI 智能出题功能"
 
 ## 版本历史
 
-### 0.0.0 (2025-05-30)
+### v1.0.0 (2025-06-01)
 
 **✨ 新增功能：**
 
-- 题库管理模块（CRUD、AI 出题）
-- 测试管理模块（创建、批改）
-- 作业管理模块
-- 考勤管理模块
-- 课程管理模块
-- 学生管理模块
-- 用户认证系统
-- GitHub Pages 自动部署
+- 题库管理模块（CRUD、多维筛选、AI 出题）
+- 测试管理模块（选题组卷、逐题批改、AI 一键批改）
+- 作业管理模块（发布作业、截止时间、状态筛选）
+- 考勤管理模块（考勤记录、统计面板、签到码生成）
+- 课程管理模块（卡片展示、批量删除、加课码复制）
+- 学生管理模块（列表/分页/搜索/CRUD）
+- 个人中心（信息编辑、密码修改、表单验证）
+- 用户认证系统（登录/登出、路由守卫、Token 管理）
 
-**🎨 UI 优化：**
+**🎨 UI/UX 优化：**
 
-- Element Plus 组件库集成
-- 响应式布局设计
-- 统一视觉风格
+- Element Plus 全面集成（中文语言包）
+- 响应式侧边栏布局（折叠/展开、小屏适配）
+- 骨架屏、空状态、二次确认等交互细节
+- 统一渐变色系（`#667eea` → `#764ba2`）
 
 **🔧 技术实现：**
 
-- Vue 3 Composition API
-- Vite 构建工具
-- Mock 数据服务
-- Axios 请求拦截
+- Vue 3 Composition API（`<script setup>`）
+- Vite 8.x 构建工具
+- Vue Router 4.x Hash 模式 + 路由守卫
+- Axios 请求/响应拦截器封装
+- vite-plugin-mock 数据模拟
+- GitHub Pages + GitHub Actions CI/CD
+- Docker 多阶段构建 + Nginx 部署
+- 一键部署脚本 `deploy.sh`
 
-完整的更新日志请查看：[CHANGELOG.md](https://github.com/codezzj/teaching-admin-vue/releases)
+完整的更新日志请查看：[Releases](https://github.com/codezzj/teaching-admin-vue/releases)
 
 ---
 
@@ -659,27 +707,30 @@ A: 使用国内镜像源：
 npm install --registry=https://registry.npmmirror.com
 ```
 
-**Q: 开发服务器无法启动？**
+**Q: 开发服务器启动后访问 localhost:5173 显示 404？**
 
-A: 检查端口是否被占用，尝试：
-```bash
-lsof -i :5173  # 查看端口占用
-# 或修改 vite.config.js 的 server.port 配置
+A: 项目配置了 `base: '/teaching-admin-vue/'`，请访问：
+```
+http://localhost:5173/teaching-admin-vue/
 ```
 
 **Q: Mock 数据不生效？**
 
-A: 检查 `vite.config.js` 中的 viteMockServe 配置，确保 `localEnabled` 和 `prodEnabled` 为 true。
+A: 检查 `vite.config.js` 中的 viteMockServe 配置，确保 `localEnabled` 和 `prodEnabled` 为 true。Mock 文件位于项目根目录的 `mock/` 文件夹下。
 
 ### 部署相关
 
 **Q: GitHub Pages 刷新后 404？**
 
-A: 本项目使用 Hash 路由模式，不会出现此问题。如使用 History 模式，需要配置 SPA 回退。
+A: 本项目使用 Hash 路由模式（URL 带 `#`），不会出现此问题。
 
-**Q: 构建后空白？**
+**Q: Docker 部署后静态资源 404？**
 
-A: 检查 `vite.config.js` 中的 `base` 配置是否正确。
+A: Docker 构建时已使用 `npx vite build --base /` 覆盖默认的 `/teaching-admin-vue/` 路径。如果手动构建请确保添加 `--base /` 参数。
+
+**Q: 构建后空白页？**
+
+A: 检查部署环境的 base 路径是否匹配：GitHub Pages 使用 `/teaching-admin-vue/`，Docker/Nginx 使用 `/`。可在 `vite.config.js` 中修改 `base` 配置。
 
 ### 功能相关
 
