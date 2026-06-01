@@ -21,6 +21,10 @@ dist-ssr
 .cache
 .vite
 .temp
+*.tsbuildinfo
+
+# Test coverage
+coverage
 
 # Environment files
 .env
@@ -40,10 +44,6 @@ dist-ssr
 
 # OS files
 Thumbs.db
-.DS_Store
 
-# Docker
+# Docker (override files may contain local secrets)
 docker-compose.override.yml
-
-# Deploy
-*.env
