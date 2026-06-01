@@ -168,12 +168,41 @@
 
 ## 环境要求
 
+### 运行环境
+
 | 环境 | 版本要求 | 说明 |
 |------|---------|------|
 | Node.js | ≥ 18.0.0 | JavaScript 运行环境 |
 | npm | ≥ 9.0.0 | 包管理器（随 Node.js 安装） |
 | Git | ≥ 2.0 | 版本控制（可选） |
 | Docker | ≥ 20.10 | 容器部署（可选） |
+
+### 操作系统
+
+| 系统 | 支持版本 |
+|------|---------|
+| Windows | Windows 10 / 11（推荐） |
+| macOS | macOS 12 Monterey 及以上 |
+| Linux | Ubuntu 20.04+ / CentOS 7+ / Debian 11+ |
+
+### 浏览器兼容
+
+| 浏览器 | 最低版本 |
+|--------|---------|
+| Chrome | ≥ 90 |
+| Edge | ≥ 90 |
+| Firefox | ≥ 90 |
+| Safari | ≥ 15 |
+
+> ⚠️ 不支持 IE 浏览器（IE 已于 2022 年终止支持）。
+
+### 推荐开发工具
+
+| 工具 | 用途 |
+|------|------|
+| [VS Code](https://code.visualstudio.com/) | 代码编辑器（推荐） |
+| [Vue DevTools](https://devtools.vuejs.org/) | Vue 调试工具（浏览器扩展） |
+| [Postman](https://www.postman.com/) | API 调试工具 |
 
 ---
 
@@ -202,9 +231,14 @@ npm install --registry=https://registry.npmmirror.com
 npm run dev
 ```
 
-启动成功后，访问：**http://localhost:5173/teaching-admin-vue/**
+启动成功后，终端会输出访问地址，默认格式为：
 
-> ⚠️ 项目配置了 `base: '/teaching-admin-vue/'`，直接访问 `http://localhost:5173` 会 404。
+```
+http://localhost:5173/teaching-admin-vue/
+```
+
+> 💡 Vite 默认端口为 `5173`，若端口被占用会自动递增（如 `5174`、`5175`），请以终端实际输出为准。
+> ⚠️ 项目配置了 `base: '/teaching-admin-vue/'`，直接访问根路径（如 `http://localhost:5173`）会返回 404。
 
 ### 4. 登录系统
 
@@ -314,10 +348,17 @@ vite-project/
 
 | 文件路径 | 说明 |
 |---------|------|
+| `src/main.js` | 应用入口文件（初始化 Vue、Router、Element Plus） |
+| `src/App.vue` | 根组件（`<router-view />` 路由出口） |
+| `src/style.css` | 全局样式定义 |
 | `src/router/index.js` | 路由配置、嵌套路由、全局前置守卫 |
 | `src/utils/request.js` | Axios 实例、请求/响应拦截器、Token 注入 |
 | `src/utils/auth.js` | Token 与用户信息 localStorage 管理 |
-| `src/layouts/AdminLayout.vue` | 后台布局（侧边栏 + 顶栏 + 内容区） |
+| `src/api/` | API 接口封装层（对应后端接口 / Mock 接口） |
+| `src/layouts/AdminLayout.vue` | 后台布局组件（侧边栏 + 顶栏 + 内容区） |
+| `src/views/Login.vue` | 登录页面（账号密码登录、记住密码） |
+| `mock/` | Mock 模拟数据目录（vite-plugin-mock） |
+| `package.json` | 项目依赖配置与 npm 脚本 |
 | `vite.config.js` | Vite 构建配置、Mock 插件、base 路径 |
 | `.github/workflows/deploy.yml` | GitHub Actions CI/CD（自动部署到 GitHub Pages） |
 | `Dockerfile` | 多阶段 Docker 构建（Node 编译 + Nginx 运行） |
@@ -419,6 +460,30 @@ docker compose down
 访问：**http://localhost:8080**
 
 > 📦 镜像基于 `nginx:1.27-alpine`，已配置 Gzip 压缩、静态资源长缓存、安全响应头。Dockerfile 内部会自动执行 `npx vite build --base /`，无需手动构建。
+
+**单独使用 Docker（不使用 docker-compose）：**
+
+```bash
+# 构建镜像
+docker build -t teaching-admin-vue .
+
+# 运行容器（映射到 8080 端口）
+docker run -d -p 8080:80 --name teaching-admin teaching-admin-vue
+
+# 查看容器日志
+docker logs -f teaching-admin
+
+# 停止容器
+docker stop teaching-admin
+
+# 删除容器
+docker rm teaching-admin
+
+# 重新构建并运行（代码更新后）
+docker stop teaching-admin && docker rm teaching-admin
+docker build -t teaching-admin-vue .
+docker run -d -p 8080:80 --name teaching-admin teaching-admin-vue
+```
 
 ### 方式三：一键部署脚本
 
@@ -707,12 +772,32 @@ A: 使用国内镜像源：
 npm install --registry=https://registry.npmmirror.com
 ```
 
-**Q: 开发服务器启动后访问 localhost:5173 显示 404？**
+**Q: 开发服务器端口被占用（如 5173 已被使用）？**
 
-A: 项目配置了 `base: '/teaching-admin-vue/'`，请访问：
+A: Vite 会自动递增端口号（5173 → 5174 → 5175），请以终端实际输出为准。也可以手动指定端口：
+```bash
+npx vite --port 3000
+```
+
+**Q: 访问 localhost:5173 显示 404？**
+
+A: 项目配置了 `base: '/teaching-admin-vue/'`，请访问完整路径：
 ```
 http://localhost:5173/teaching-admin-vue/
 ```
+端口号以终端输出为准（可能是 5174 或其他）。
+
+**Q: 开发时如何清除登录状态重新看到登录页？**
+
+A: 打开浏览器开发者工具（F12），进入 **Application** → **Local Storage**，删除 `token` 和 `user` 两个 key，刷新页面即可。
+
+**Q: 换一台新电脑需要重新登录吗？**
+
+A: 是的。登录信息（token）保存在浏览器本地存储（localStorage）中，更换电脑或浏览器都需要重新登录。
+
+**Q: 如何切换 Mock 数据和真实后端 API？**
+
+A: 修改 `vite.config.js` 中 `viteMockServe` 的 `localEnabled` 为 `false` 即可关闭 Mock。同时需要在 `.env` 文件中配置真实的 `VITE_API_BASE_URL`。
 
 **Q: Mock 数据不生效？**
 
@@ -728,9 +813,22 @@ A: 本项目使用 Hash 路由模式（URL 带 `#`），不会出现此问题。
 
 A: Docker 构建时已使用 `npx vite build --base /` 覆盖默认的 `/teaching-admin-vue/` 路径。如果手动构建请确保添加 `--base /` 参数。
 
+**Q: Docker 容器端口冲突（8080 已被占用）？**
+
+A: 修改端口映射，将宿主机端口改为其他值：
+```bash
+# docker-compose 方式：修改 docker-compose.yml 中 ports 配置
+# Docker 方式：修改 -p 参数
+docker run -d -p 9090:80 --name teaching-admin teaching-admin-vue
+```
+
 **Q: 构建后空白页？**
 
 A: 检查部署环境的 base 路径是否匹配：GitHub Pages 使用 `/teaching-admin-vue/`，Docker/Nginx 使用 `/`。可在 `vite.config.js` 中修改 `base` 配置。
+
+**Q: 如何在同一台服务器部署多个 Vite 项目？**
+
+A: 修改每个项目的 `vite.config.js` 中的 `base` 路径和 Nginx 的 `location` 配置，确保路径不冲突。
 
 ### 功能相关
 
